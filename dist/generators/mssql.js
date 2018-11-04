@@ -150,7 +150,7 @@ var MSSQL = function (_SchemaGenerator) {
   }, {
     key: 'insertInto',
     value: function insertInto(into, from) {
-      var parts = [(0, _util.format)('SET IDENTITY_INSERT %s ON;', this.tableName(into)), _get(MSSQL.prototype.__proto__ || Object.getPrototypeOf(MSSQL.prototype), 'insertInto', this).call(this, into, from), (0, _util.format)('SET IDENTITY_INSERT %s OFF;', this.tableName(into)), (0, _util.format)('DBCC CHECKIDENT (%s);', this.tableName(into))];
+      var parts = [(0, _util.format)('SET IDENTITY_INSERT %s ON;', this.tableName(into)), _get(MSSQL.prototype.__proto__ || Object.getPrototypeOf(MSSQL.prototype), 'insertInto', this).call(this, into, from), (0, _util.format)('SET IDENTITY_INSERT %s OFF;', this.tableName(into)), (0, _util.format)('DBCC CHECKIDENT (\'%s\');', this.tableName(into))];
 
       return parts;
     }

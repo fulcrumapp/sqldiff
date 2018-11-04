@@ -100,7 +100,7 @@ export default class MSSQL extends SchemaGenerator {
       fmt('SET IDENTITY_INSERT %s ON;', this.tableName(into)),
       super.insertInto(into, from),
       fmt('SET IDENTITY_INSERT %s OFF;', this.tableName(into)),
-      fmt('DBCC CHECKIDENT (%s);', this.tableName(into))
+      fmt('DBCC CHECKIDENT (\'%s\');', this.tableName(into))
     ];
 
     return parts;
