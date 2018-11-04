@@ -96,11 +96,12 @@ export default class MSSQL extends SchemaGenerator {
   }
 
   insertInto(into, from) {
-    const parts = [ super.insertInto(into, from) ];
-
-    // parts.push(fmt("SELECT setval('%s', (SELECT MAX(id) FROM %s));",
-    //                this.escapedSchema() + this.primaryKeySequenceName(into),
-    //                this.tableName(into)));
+    const parts = [
+      fmt('SET IDENTITY_INSERT %s ON;', this.tableName(into)),
+      super.insertInto(into, from),
+      fmt('SET IDENTITY_INSERT %s OFF;', this.tableName(into)),
+      fmt('DBCC CHECKIDENT (%s);', this.tableName(into))
+    ];
 
     return parts;
   }
