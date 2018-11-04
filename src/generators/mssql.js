@@ -36,7 +36,7 @@ export default class MSSQL extends SchemaGenerator {
   }
 
   transformToText(columnName) {
-    return fmt('CAST(%s AS text)', columnName);
+    return fmt('CAST(%s AS varchar(max))', columnName);
   }
 
   transformToDouble(columnName) {
@@ -87,6 +87,12 @@ export default class MSSQL extends SchemaGenerator {
     return fmt('DROP TABLE IF EXISTS %s%s;',
                this.escapedSchema(),
                this.escape(this.tablePrefix + change.oldTable.name));
+  }
+
+  renameTable(change) {
+    return fmt('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';',
+       this.tableName(change.oldTable).replace(/[\[\]]/g, ''),
+       this.tableName(change.newTable).replace(/[\[\]]/g, ''));
   }
 
   insertInto(into, from) {

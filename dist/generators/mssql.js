@@ -69,7 +69,7 @@ var MSSQL = function (_SchemaGenerator) {
   }, {
     key: 'transformToText',
     value: function transformToText(columnName) {
-      return (0, _util.format)('CAST(%s AS text)', columnName);
+      return (0, _util.format)('CAST(%s AS varchar(max))', columnName);
     }
   }, {
     key: 'transformToDouble',
@@ -141,6 +141,11 @@ var MSSQL = function (_SchemaGenerator) {
     key: 'dropTable',
     value: function dropTable(change) {
       return (0, _util.format)('DROP TABLE IF EXISTS %s%s;', this.escapedSchema(), this.escape(this.tablePrefix + change.oldTable.name));
+    }
+  }, {
+    key: 'renameTable',
+    value: function renameTable(change) {
+      return (0, _util.format)('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';', this.tableName(change.oldTable).replace(/[\[\]]/g, ''), this.tableName(change.newTable).replace(/[\[\]]/g, ''));
     }
   }, {
     key: 'insertInto',
