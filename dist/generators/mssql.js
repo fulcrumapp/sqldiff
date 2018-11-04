@@ -145,7 +145,7 @@ var MSSQL = function (_SchemaGenerator) {
   }, {
     key: 'renameTable',
     value: function renameTable(change) {
-      return (0, _util.format)('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';', this.tableName(change.oldTable).replace(/[\[\]]/g, ''), this.tableName(change.newTable).replace(/[\[\]]/g, ''));
+      return (0, _util.format)('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';', this.tableName(change.oldTable).replace(/[\[\]]/g, ''), this.escape(this.tablePrefix + change.newTable.name));
     }
   }, {
     key: 'insertInto',

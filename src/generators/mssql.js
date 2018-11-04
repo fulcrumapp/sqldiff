@@ -92,7 +92,7 @@ export default class MSSQL extends SchemaGenerator {
   renameTable(change) {
     return fmt('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';',
        this.tableName(change.oldTable).replace(/[\[\]]/g, ''),
-       this.tableName(change.newTable).replace(/[\[\]]/g, ''));
+       this.escape(this.tablePrefix + change.newTable.name));
   }
 
   insertInto(into, from) {
