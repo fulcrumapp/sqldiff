@@ -27,3 +27,7 @@ DROP TABLE IF EXISTS organization_1.users CASCADE;
 sqlite: '''
 DROP TABLE IF EXISTS `account_1_users`;
 '''
+
+mssql: '''
+DROP TABLE IF EXISTS [account_1_users];
+'''

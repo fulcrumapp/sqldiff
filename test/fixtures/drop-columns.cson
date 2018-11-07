@@ -53,3 +53,17 @@ ALTER TABLE `account_1_tmp_new_users` RENAME TO `account_1_users`;
 DROP TABLE IF EXISTS `account_1_tmp_old_users`;
 '''
 
+mssql: '''
+CREATE TABLE [account_1_tmp_new_users] (
+  [id] bigint NOT NULL IDENTITY(1,1) PRIMARY KEY,
+  [name] varchar(max),
+  [age] float
+);
+SET IDENTITY_INSERT [account_1_tmp_new_users] ON;
+INSERT INTO [account_1_tmp_new_users] ([id], [name], [age]) SELECT [id], [name], [age] FROM [account_1_users];
+SET IDENTITY_INSERT [account_1_tmp_new_users] OFF;
+DBCC CHECKIDENT ('[account_1_tmp_new_users]');
+EXEC sp_rename 'account_1_users', 'account_1_tmp_old_users', 'OBJECT';
+EXEC sp_rename 'account_1_tmp_new_users', 'account_1_users', 'OBJECT';
+DROP TABLE IF EXISTS [account_1_tmp_old_users];
+'''

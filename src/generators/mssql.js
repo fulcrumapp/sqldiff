@@ -25,6 +25,10 @@ export default class MSSQL extends SchemaGenerator {
     return '[' + identifier + ']';
   }
 
+  unescape(identifier) {
+    return identifier.replace(/[\[\]]/g, '');
+  }
+
   typeForColumn(column) {
     if (column.type === 'string') {
       if (/_id$/.test(column.name) || column.length != null) {
@@ -47,6 +51,12 @@ export default class MSSQL extends SchemaGenerator {
     return fmt('CREATE TABLE %s (\n  %s\n);',
                this.tableName(change.newTable),
                this.columnsForTable(change.newTable).join(',\n  '));
+  }
+
+  addColumn(change) {
+    return fmt('ALTER TABLE %s ADD %s;',
+               this.tableName(change.newTable),
+               this.columnDefinition(change.column));
   }
 
   createView(change) {
@@ -75,7 +85,6 @@ export default class MSSQL extends SchemaGenerator {
     const tableName = this.tableName(change.newTable);
     const columns = change.columns.map(c => this.escape(c)).join(', ');
     const unique = change.unique ? 'UNIQUE ' : '';
-    // const withClause = method === 'gin' ? ' WITH (fastupdate = off)' : '';
 
     const spatial = method === 'spatial' ? ' SPATIAL' : '';
 
@@ -91,8 +100,14 @@ export default class MSSQL extends SchemaGenerator {
 
   renameTable(change) {
     return fmt('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';',
-       this.tableName(change.oldTable).replace(/[\[\]]/g, ''),
+       this.unescape(this.tableName(change.oldTable)),
        this.tablePrefix + change.newTable.name);
+  }
+
+  renameColumn(change) {
+    return fmt('EXEC sp_rename \'%s\', \'%s\', \'COLUMN\';',
+       [this.unescape(this.tableName(change.newTable)), change.oldColumn.name].join('.'),
+       change.newColumn.name);
   }
 
   insertInto(into, from) {

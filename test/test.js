@@ -8,6 +8,7 @@ import Table from '../src/table';
 import SchemaDiffer from '../src/schema-differ';
 import Postgres from '../src/generators/postgres';
 import Sqlite from '../src/generators/sqlite';
+import MSSQL from '../src/generators/mssql';
 
 chai.should();
 
@@ -61,6 +62,12 @@ function generateSqlite(differ) {
   return gen.generate().join('\n').trim();
 }
 
+function generateMssql(differ) {
+  const gen = new MSSQL(differ, { enableViews: false });
+  gen.tablePrefix = 'account_1_';
+  return gen.generate().join('\n').trim();
+}
+
 function run(testPath) {
   const spec = CSON.parse(fs.readFileSync(testPath));
 
@@ -80,19 +87,11 @@ function run(testPath) {
 
     const pg = generatePostgres(differ);
     const sqlite = generateSqlite(differ);
+    const mssql = generateMssql(differ);
 
     pg.should.eql(spec.postgres);
     sqlite.should.eql(spec.sqlite);
-
-    if (pg !== spec.postgres) {
-      console.log('-POSTGRES-');
-      dumpScript(pg);
-    }
-
-    if (sqlite !== spec.sqlite) {
-      console.log('-SQLITE-');
-      dumpScript(sqlite);
-    }
+    mssql.should.eql(spec.mssql);
   });
 }
 

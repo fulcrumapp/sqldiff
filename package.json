@@ -1,6 +1,6 @@
 {
   "name": "sqldiff",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "description": "Generate SQL table schema diffs",
   "main": "dist/index.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "git://github.com/fulcrumapp/sqldiff.git"
   },
   "scripts": {
-    "test": "npm run lint && node_modules/.bin/mocha ./test/setup.js test/test.js",
+    "test": "node_modules/.bin/mocha ./test/setup.js test/test.js",
     "prepublish": "npm run lint && npm run clean && npm run build",
     "lint": "node_modules/.bin/eslint src",
     "build": "node_modules/.bin/babel src --out-dir dist --source-maps",

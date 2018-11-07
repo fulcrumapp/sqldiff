@@ -30,3 +30,8 @@ sqlite: '''
 ALTER TABLE `account_1_users` ADD COLUMN `desc` TEXT;
 ALTER TABLE `account_1_users` ADD COLUMN `age` INTEGER;
 '''
+
+mssql: '''
+ALTER TABLE [account_1_users] ADD [desc] varchar(max);
+ALTER TABLE [account_1_users] ADD [age] bigint;
+'''
