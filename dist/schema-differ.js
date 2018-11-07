@@ -212,7 +212,7 @@ var SchemaDiff = function () {
                 } else if (oldColumn.name !== newColumn.name) {
                   // TODO(zhm) this can't be hit because isEqualTo checks the names
                   // SQLite cannot rename columns, so column renames are a bit special
-                  this.addChange('rename-column', { oldTable: pair.oldTable, newTable: pair.newTable, column: oldColumn });
+                  this.addChange('rename-column', { oldTable: pair.oldTable, newTable: pair.newTable, oldColumn: oldColumn, newColumn: newColumn });
                 }
 
                 exists = true;

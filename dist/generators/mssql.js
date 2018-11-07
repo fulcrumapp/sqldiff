@@ -56,6 +56,11 @@ var MSSQL = function (_SchemaGenerator) {
       return '[' + identifier + ']';
     }
   }, {
+    key: 'unescape',
+    value: function unescape(identifier) {
+      return identifier.replace(/[\[\]]/g, '');
+    }
+  }, {
     key: 'typeForColumn',
     value: function typeForColumn(column) {
       if (column.type === 'string') {
@@ -80,6 +85,11 @@ var MSSQL = function (_SchemaGenerator) {
     key: 'createTable',
     value: function createTable(change) {
       return (0, _util.format)('CREATE TABLE %s (\n  %s\n);', this.tableName(change.newTable), this.columnsForTable(change.newTable).join(',\n  '));
+    }
+  }, {
+    key: 'addColumn',
+    value: function addColumn(change) {
+      return (0, _util.format)('ALTER TABLE %s ADD %s;', this.tableName(change.newTable), this.columnDefinition(change.column));
     }
   }, {
     key: 'createView',
@@ -131,7 +141,6 @@ var MSSQL = function (_SchemaGenerator) {
         return _this2.escape(c);
       }).join(', ');
       var unique = change.unique ? 'UNIQUE ' : '';
-      // const withClause = method === 'gin' ? ' WITH (fastupdate = off)' : '';
 
       var spatial = method === 'spatial' ? ' SPATIAL' : '';
 
@@ -145,7 +154,12 @@ var MSSQL = function (_SchemaGenerator) {
   }, {
     key: 'renameTable',
     value: function renameTable(change) {
-      return (0, _util.format)('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';', this.tableName(change.oldTable).replace(/[\[\]]/g, ''), this.tablePrefix + change.newTable.name);
+      return (0, _util.format)('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';', this.unescape(this.tableName(change.oldTable)), this.tablePrefix + change.newTable.name);
+    }
+  }, {
+    key: 'renameColumn',
+    value: function renameColumn(change) {
+      return (0, _util.format)('EXEC sp_rename \'%s\', \'%s\', \'COLUMN\';', [this.unescape(this.tableName(change.newTable)), change.oldColumn.name].join('.'), change.newColumn.name);
     }
   }, {
     key: 'insertInto',
