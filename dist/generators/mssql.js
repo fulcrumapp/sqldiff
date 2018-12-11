@@ -149,7 +149,7 @@ var MSSQL = function (_SchemaGenerator) {
   }, {
     key: 'dropTable',
     value: function dropTable(change) {
-      return (0, _util.format)('DROP TABLE IF EXISTS %s%s;', this.escapedSchema(), this.escape(this.tablePrefix + change.oldTable.name));
+      return (0, _util.format)("IF OBJECT_ID('%s%s', 'U') IS NOT NULL DROP TABLE %s%s;", this.escapedSchema(), this.escape(this.tablePrefix + change.oldTable.name), this.escapedSchema(), this.escape(this.tablePrefix + change.oldTable.name));
     }
   }, {
     key: 'renameTable',
