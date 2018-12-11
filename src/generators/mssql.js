@@ -93,7 +93,9 @@ export default class MSSQL extends SchemaGenerator {
   }
 
   dropTable(change) {
-    return fmt('DROP TABLE IF EXISTS %s%s;',
+    return fmt("IF OBJECT_ID('%s%s', 'U') IS NOT NULL DROP TABLE %s%s;",
+               this.escapedSchema(),
+               this.escape(this.tablePrefix + change.oldTable.name),
                this.escapedSchema(),
                this.escape(this.tablePrefix + change.oldTable.name));
   }

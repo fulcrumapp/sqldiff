@@ -29,5 +29,5 @@ DROP TABLE IF EXISTS `account_1_users`;
 '''
 
 mssql: '''
-DROP TABLE IF EXISTS [account_1_users];
+IF OBJECT_ID('[account_1_users]', 'U') IS NOT NULL DROP TABLE [account_1_users];
 '''
