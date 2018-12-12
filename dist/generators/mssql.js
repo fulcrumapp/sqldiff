@@ -147,6 +147,11 @@ var MSSQL = function (_SchemaGenerator) {
       return (0, _util.format)('CREATE%s %sINDEX %s ON %s (%s);', spatial, unique, indexName, tableName, columns);
     }
   }, {
+    key: 'dropView',
+    value: function dropView(change) {
+      return (0, _util.format)("IF OBJECT_ID('%s%s', 'V') IS NOT NULL DROP VIEW %s%s;", this.escapedSchema(), this.escape(this.tablePrefix + change.oldView.name), this.escapedSchema(), this.escape(this.tablePrefix + change.oldView.name));
+    }
+  }, {
     key: 'dropTable',
     value: function dropTable(change) {
       return (0, _util.format)("IF OBJECT_ID('%s%s', 'U') IS NOT NULL DROP TABLE %s%s;", this.escapedSchema(), this.escape(this.tablePrefix + change.oldTable.name), this.escapedSchema(), this.escape(this.tablePrefix + change.oldTable.name));

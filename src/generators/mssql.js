@@ -92,6 +92,14 @@ export default class MSSQL extends SchemaGenerator {
                spatial, unique, indexName, tableName, columns);
   }
 
+  dropView(change) {
+    return fmt("IF OBJECT_ID('%s%s', 'V') IS NOT NULL DROP VIEW %s%s;",
+               this.escapedSchema(),
+               this.escape(this.tablePrefix + change.oldView.name),
+               this.escapedSchema(),
+               this.escape(this.tablePrefix + change.oldView.name));
+  }
+
   dropTable(change) {
     return fmt("IF OBJECT_ID('%s%s', 'U') IS NOT NULL DROP TABLE %s%s;",
                this.escapedSchema(),
