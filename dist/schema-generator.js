@@ -364,6 +364,8 @@ var SchemaGenerator = function () {
           return _this.transformToDouble(_this.escape(column.oldColumn.name));
         } else if (column.oldColumn.type === 'double' && column.newColumn.type !== 'double') {
           return _this.transformToText(_this.escape(column.oldColumn.name));
+        } else if (column.oldColumn.type !== 'date' && column.newColumn.type === 'date') {
+          return _this.transformToDate(_this.escape(column.oldColumn.name));
         } else {
           return _this.escape(column.oldColumn.name);
         }

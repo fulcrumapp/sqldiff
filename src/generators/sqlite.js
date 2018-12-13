@@ -23,6 +23,10 @@ export default class Sqlite extends SchemaGenerator {
     return fmt('CAST(%s AS text)', columnName);
   }
 
+  transformToDate(columnName) {
+    return this.transformToText(columnName);
+  }
+
   transformToDouble(columnName) {
     return fmt('(CASE ' +
                'WHEN LENGTH(TRIM(%s)) = 0 THEN NULL ' +

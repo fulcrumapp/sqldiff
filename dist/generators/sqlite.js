@@ -53,6 +53,11 @@ var Sqlite = function (_SchemaGenerator) {
       return (0, _util.format)('CAST(%s AS text)', columnName);
     }
   }, {
+    key: 'transformToDate',
+    value: function transformToDate(columnName) {
+      return this.transformToText(columnName);
+    }
+  }, {
     key: 'transformToDouble',
     value: function transformToDouble(columnName) {
       return (0, _util.format)('(CASE ' + 'WHEN LENGTH(TRIM(%s)) = 0 THEN NULL ' + 'WHEN CAST(%s AS REAL) = 0 AND ' + "LENGTH(TRIM(REPLACE(REPLACE(REPLACE(%s, '.', ''), '0', ' '), '-', ''))) > 0 THEN NULL " + 'ELSE CAST(%s AS REAL) ' + 'END)', columnName, columnName, columnName, columnName);

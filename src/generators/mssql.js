@@ -47,6 +47,10 @@ export default class MSSQL extends SchemaGenerator {
     return fmt('IIF(ISNUMERIC(%s), %s, NULL)', columnName, columnName);
   }
 
+  transformToDate(columnName) {
+    return fmt('TRY_CAST(%s AS date)', columnName);
+  }
+
   createTable(change) {
     return fmt('CREATE TABLE %s (\n  %s\n);',
                this.tableName(change.newTable),

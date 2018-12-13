@@ -86,6 +86,11 @@ var Postgres = function (_SchemaGenerator) {
       return (0, _util.format)('FCM_ConvertToFloat(%s)', columnName);
     }
   }, {
+    key: 'transformToDate',
+    value: function transformToDate(columnName) {
+      return (0, _util.format)('FCM_ConvertToDate(%s)', columnName);
+    }
+  }, {
     key: 'primaryKeyName',
     value: function primaryKeyName(table) {
       return this.escape(this.tablePrefix + table.name + '_pkey');

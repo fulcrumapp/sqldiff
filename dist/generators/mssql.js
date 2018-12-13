@@ -82,6 +82,11 @@ var MSSQL = function (_SchemaGenerator) {
       return (0, _util.format)('IIF(ISNUMERIC(%s), %s, NULL)', columnName, columnName);
     }
   }, {
+    key: 'transformToDate',
+    value: function transformToDate(columnName) {
+      return (0, _util.format)('TRY_CAST(%s AS date)', columnName);
+    }
+  }, {
     key: 'createTable',
     value: function createTable(change) {
       return (0, _util.format)('CREATE TABLE %s (\n  %s\n);', this.tableName(change.newTable), this.columnsForTable(change.newTable).join(',\n  '));

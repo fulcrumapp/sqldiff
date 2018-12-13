@@ -241,6 +241,8 @@ export default class SchemaGenerator {
         return this.transformToDouble(this.escape(column.oldColumn.name));
       } else if (column.oldColumn.type === 'double' && column.newColumn.type !== 'double') {
         return this.transformToText(this.escape(column.oldColumn.name));
+      } else if (column.oldColumn.type !== 'date' && column.newColumn.type === 'date') {
+        return this.transformToDate(this.escape(column.oldColumn.name));
       } else {
         return this.escape(column.oldColumn.name);
       }

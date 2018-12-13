@@ -51,6 +51,10 @@ export default class Postgres extends SchemaGenerator {
     return fmt('FCM_ConvertToFloat(%s)', columnName);
   }
 
+  transformToDate(columnName) {
+    return fmt('FCM_ConvertToDate(%s)', columnName);
+  }
+
   primaryKeyName(table) {
     return this.escape(this.tablePrefix + table.name + '_pkey');
   }
