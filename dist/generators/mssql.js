@@ -79,7 +79,7 @@ var MSSQL = function (_SchemaGenerator) {
   }, {
     key: 'transformToDouble',
     value: function transformToDouble(columnName) {
-      return (0, _util.format)('IIF(ISNUMERIC(%s), %s, NULL)', columnName, columnName);
+      return (0, _util.format)('TRY_PARSE(%s AS float)', columnName);
     }
   }, {
     key: 'transformToDate',

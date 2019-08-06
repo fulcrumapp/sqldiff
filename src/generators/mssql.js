@@ -44,7 +44,7 @@ export default class MSSQL extends SchemaGenerator {
   }
 
   transformToDouble(columnName) {
-    return fmt('IIF(ISNUMERIC(%s), %s, NULL)', columnName, columnName);
+    return fmt('TRY_PARSE(%s AS float)', columnName);
   }
 
   transformToDate(columnName) {

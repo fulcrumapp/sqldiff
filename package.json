@@ -1,6 +1,6 @@
 {
   "name": "sqldiff",
-  "version": "0.0.30",
+  "version": "0.1.0",
   "description": "Generate SQL table schema diffs",
   "main": "dist/index.js",
   "repository": {
