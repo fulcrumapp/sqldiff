@@ -3,39 +3,18 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+class SchemaChange {
+  constructor(type, options) {
+    this.type = type;
 
-var SchemaChange = function SchemaChange(type, options) {
-  _classCallCheck(this, SchemaChange);
-
-  this.type = type;
-
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = Object.keys(options)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var key = _step.value;
-
+    for (const key of Object.keys(options)) {
       this[key] = options[key];
     }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
   }
-};
+
+}
 
 exports.default = SchemaChange;
 //# sourceMappingURL=schema-change.js.map

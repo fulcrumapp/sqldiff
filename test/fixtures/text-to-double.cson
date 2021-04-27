@@ -63,7 +63,7 @@ CREATE TABLE [account_1_tmp_new_users] (
   [height] float
 );
 SET IDENTITY_INSERT [account_1_tmp_new_users] ON;
-INSERT INTO [account_1_tmp_new_users] ([id], [name], [desc], [height]) SELECT [id], [name], [desc], IIF(ISNUMERIC([height]), [height], NULL) FROM [account_1_users];
+INSERT INTO [account_1_tmp_new_users] ([id], [name], [desc], [height]) SELECT [id], [name], [desc], TRY_PARSE([height] AS float) FROM [account_1_users];
 SET IDENTITY_INSERT [account_1_tmp_new_users] OFF;
 DBCC CHECKIDENT ('[account_1_tmp_new_users]');
 EXEC sp_rename 'account_1_users', 'account_1_tmp_old_users', 'OBJECT';

@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { find, map, reject, includes, filter } from 'lodash';
 import SchemaChange from './schema-change';
 
 export default class SchemaDiff {
@@ -30,23 +30,23 @@ export default class SchemaDiff {
   }
 
   diffTables() {
-    const newTables = (this.newSchema ? this.newSchema.tables : null);
-    const oldTables = (this.oldSchema ? this.oldSchema.tables : null);
+    const newTables = this.newSchema ? this.newSchema.tables : null;
+    const oldTables = this.oldSchema ? this.oldSchema.tables : null;
 
     if (this.oldSchema) {
       for (const oldTable of this.oldSchema.tables) {
         let newTable = null;
 
         if (newTables) {
-          newTable = _.find(newTables, (t) => t.id === oldTable.id);
+          newTable = find(newTables, (t) => t.id === oldTable.id);
         }
 
         if (newTable) {
           if (newTable.name !== oldTable.name) {
-            this.addChange('rename-table', {oldTable: oldTable, newTable: newTable});
+            this.addChange('rename-table', { oldTable: oldTable, newTable: newTable });
           }
         } else {
-          this.addChange('drop-table', {oldTable: oldTable});
+          this.addChange('drop-table', { oldTable: oldTable });
         }
       }
     }
@@ -56,11 +56,11 @@ export default class SchemaDiff {
         let oldTable = null;
 
         if (oldTables) {
-          oldTable = _.find(oldTables, (t) => t.id === newTable.id);
+          oldTable = find(oldTables, (t) => t.id === newTable.id);
         }
 
         if (!oldTable) {
-          this.addChange('create-table', {newTable: newTable});
+          this.addChange('create-table', { newTable: newTable });
         }
       }
     }
@@ -69,19 +69,17 @@ export default class SchemaDiff {
   conflate() {
     // if we're re-creating a table, we don't need to rename, drop, or add any new columns because
     // the recreate handles all of those.
-    const recreates = _.select(this.changes, (change) => {
-      return change.type === 'recreate-table';
-    });
+    const recreates = filter(this.changes, change => change.type === 'recreate-table');
 
-    const ids = _.map(recreates, (change) => change.newTable.id);
+    const ids = map(recreates, change => change.newTable.id);
 
-    this.changes = _.reject(this.changes, (change) => {
-      const isSimpleChange = _.contains(['rename-column', 'drop-column', 'add-column'], change.type);
+    this.changes = reject(this.changes, change => {
+      const isSimpleChange = includes([ 'rename-column', 'drop-column', 'add-column' ], change.type);
 
       let isTableAlreadyBeingRecreated = false;
 
       if (change.newTable) {
-        isTableAlreadyBeingRecreated = _.contains(ids, change.newTable.id);
+        isTableAlreadyBeingRecreated = includes(ids, change.newTable.id);
       }
 
       return isSimpleChange && isTableAlreadyBeingRecreated;
@@ -97,7 +95,7 @@ export default class SchemaDiff {
         let oldTable = null;
 
         if (this.oldSchema) {
-          oldTable = _.find(this.oldSchema.tables, (t) => t.id === newTable.id);
+          oldTable = find(this.oldSchema.tables, (t) => t.id === newTable.id);
         }
 
         return { oldTable: oldTable, newTable: newTable };
@@ -105,7 +103,7 @@ export default class SchemaDiff {
     }
 
     // only process column-level changes on tables that exist already
-    pairs = _.filter(pairs, (pair) => {
+    pairs = filter(pairs, pair => {
       return pair.oldTable && pair.newTable && pair.oldTable.id === pair.newTable.id;
     });
 
@@ -121,7 +119,7 @@ export default class SchemaDiff {
         let oldView = null;
 
         if (this.oldSchema) {
-          oldView = _.find(this.oldSchema.views, (t) => t.id === newView.id);
+          oldView = find(this.oldSchema.views, (t) => t.id === newView.id);
         }
 
         return { oldView: oldView, newView: newView };
@@ -129,7 +127,7 @@ export default class SchemaDiff {
     }
 
     // only process column-level changes on views that exist already
-    pairs = _.filter(pairs, (pair) => {
+    pairs = filter(pairs, (pair) => {
       return pair.oldView && pair.newView && pair.oldView.id === pair.newView.id;
     });
 
@@ -145,8 +143,8 @@ export default class SchemaDiff {
     const recreatedTableIdentifiers = [];
 
     for (const pair of tablePairs) {
-      const oldColumns = (pair.oldTable ? pair.oldTable.columns : []);
-      const newColumns = (pair.newTable ? pair.newTable.columns : []);
+      const oldColumns = pair.oldTable ? pair.oldTable.columns : [];
+      const newColumns = pair.newTable ? pair.newTable.columns : [];
 
       for (let oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
         const oldColumn = oldColumns[oldIndex];
@@ -162,15 +160,15 @@ export default class SchemaDiff {
             // to be taken.
             if (oldIndex !== newIndex || !newColumn.isEqualTo(oldColumn)) {
               // column reordering requires rebuilding the entire table, 1 per table
-              if (!_.contains(recreatedTableIdentifiers, pair.newTable.id)) {
-                this.addChange('recreate-table', {oldTable: pair.oldTable, newTable: pair.newTable});
+              if (!includes(recreatedTableIdentifiers, pair.newTable.id)) {
+                this.addChange('recreate-table', { oldTable: pair.oldTable, newTable: pair.newTable });
 
                 recreatedTableIdentifiers.push(pair.newTable.id);
               }
             } else if (oldColumn.name !== newColumn.name) {
               // TODO(zhm) this can't be hit because isEqualTo checks the names
               // SQLite cannot rename columns, so column renames are a bit special
-              this.addChange('rename-column', {oldTable: pair.oldTable, newTable: pair.newTable, oldColumn: oldColumn, newColumn: newColumn});
+              this.addChange('rename-column', { oldTable: pair.oldTable, newTable: pair.newTable, oldColumn: oldColumn, newColumn: newColumn });
             }
 
             exists = true;
@@ -178,7 +176,7 @@ export default class SchemaDiff {
         }
 
         if (!exists) {
-          this.addChange('drop-column', {oldTable: pair.oldTable, newTable: pair.newTable, column: oldColumn});
+          this.addChange('drop-column', { oldTable: pair.oldTable, newTable: pair.newTable, column: oldColumn });
         }
       }
 
@@ -196,31 +194,31 @@ export default class SchemaDiff {
         }
 
         if (!exists) {
-          this.addChange('add-column', {oldTable: pair.oldTable, newTable: pair.newTable, column: newColumn});
+          this.addChange('add-column', { oldTable: pair.oldTable, newTable: pair.newTable, column: newColumn });
         }
       }
     }
   }
 
   diffViews() {
-    const newViews = (this.newSchema && this.newSchema.views ? this.newSchema.views : null);
-    const oldViews = (this.oldSchema && this.oldSchema.views ? this.oldSchema.views : null);
+    const newViews = this.newSchema && this.newSchema.views ? this.newSchema.views : null;
+    const oldViews = this.oldSchema && this.oldSchema.views ? this.oldSchema.views : null;
 
     if (oldViews) {
       for (const oldView of oldViews) {
         let newView = null;
 
         if (newViews) {
-          newView = _.find(newViews, (t) => t.id === oldView.id);
+          newView = find(newViews, (t) => t.id === oldView.id);
         }
 
         if (newView) {
-          if (newView.name !== newView.name) {
-            this.addChange('drop-view', {oldView: oldView});
-            this.addChange('create-view', {newView: newView});
+          if (oldView.name !== newView.name) {
+            this.addChange('drop-view', { oldView: oldView });
+            this.addChange('create-view', { newView: newView });
           }
         } else {
-          this.addChange('drop-view', {oldView: oldView});
+          this.addChange('drop-view', { oldView: oldView });
         }
       }
     }
@@ -230,13 +228,13 @@ export default class SchemaDiff {
         let oldView = null;
 
         if (oldViews) {
-          oldView = _.find(oldViews, (t) => t.id === newView.id);
+          oldView = find(oldViews, (t) => t.id === newView.id);
         }
 
         if (!oldView) {
           // do a drop for now `ERROR:  cannot change name of view column`
-          this.addChange('drop-view', {oldView: newView});
-          this.addChange('create-view', {newView: newView});
+          this.addChange('drop-view', { oldView: newView });
+          this.addChange('create-view', { newView: newView });
         }
       }
     }
@@ -250,8 +248,8 @@ export default class SchemaDiff {
     for (const pair of viewPairs) {
       let needsRebuild = false;
 
-      const oldColumns = (pair.oldView ? pair.oldView.columns : []);
-      const newColumns = (pair.newView ? pair.newView.columns : []);
+      const oldColumns = pair.oldView ? pair.oldView.columns : [];
+      const newColumns = pair.newView ? pair.newView.columns : [];
 
       for (let oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
         const oldColumn = oldColumns[oldIndex];
@@ -303,9 +301,9 @@ export default class SchemaDiff {
       }
 
       if (needsRebuild) {
-        if (!_.contains(recreatedViewIdentifiers, pair.newView.id)) {
-          this.addChange('drop-view', {oldView: pair.oldView});
-          this.addChange('create-view', {newView: pair.newView});
+        if (!includes(recreatedViewIdentifiers, pair.newView.id)) {
+          this.addChange('drop-view', { oldView: pair.oldView });
+          this.addChange('create-view', { newView: pair.newView });
 
           recreatedViewIdentifiers.push(pair.newView.id);
         }

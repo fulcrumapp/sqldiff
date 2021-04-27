@@ -8,6 +8,19 @@ old: [
   ] ]
 ]
 
+oldViews: [
+  [
+    'users_view'
+    'users_view',
+    'users',
+    {},
+    [
+      [ 'id', 'integer', 'id' ]
+      [ 'name', 'string', 'user_name' ]
+    ]
+  ]
+]
+
 new: [
   [ 'users', [
     [ 'id', 'pk' ]
@@ -17,6 +30,20 @@ new: [
   ] ]
 ]
 
+newViews: [
+  [
+    'users_view'
+    'users_view',
+    'users',
+    {},
+    [
+      [ 'id', 'integer', 'id' ]
+      [ 'name', 'string', 'user_name' ]
+      [ 'age', 'string', 'user_age' ]
+    ]
+  ]
+]
+
 diff: [
   [ type: 'add-column' ]
 ]
@@ -24,14 +51,35 @@ diff: [
 postgres: '''
 ALTER TABLE organization_1.users ADD COLUMN desc text;
 ALTER TABLE organization_1.users ADD COLUMN age bigint;
+DROP VIEW IF EXISTS organization_1.users_view CASCADE;
+CREATE OR REPLACE VIEW organization_1.users_view AS
+SELECT
+  id AS id,
+  name AS user_name,
+  age AS user_age
+FROM organization_1.users;
 '''
 
 sqlite: '''
 ALTER TABLE `account_1_users` ADD COLUMN `desc` TEXT;
 ALTER TABLE `account_1_users` ADD COLUMN `age` INTEGER;
+DROP VIEW IF EXISTS `account_1_users_view`;
+CREATE VIEW IF NOT EXISTS `account_1_users_view` AS
+SELECT
+  `id` AS `id`,
+  `name` AS `user_name`,
+  `age` AS `user_age`
+FROM `account_1_users`;
 '''
 
 mssql: '''
 ALTER TABLE [account_1_users] ADD [desc] varchar(max);
 ALTER TABLE [account_1_users] ADD [age] bigint;
+IF OBJECT_ID('[account_1_users_view]', 'V') IS NOT NULL DROP VIEW [account_1_users_view];
+CREATE VIEW [account_1_users_view] AS
+SELECT
+  [id] AS [id],
+  [name] AS [user_name],
+  [age] AS [user_age]
+FROM [account_1_users];
 '''

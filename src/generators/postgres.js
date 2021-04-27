@@ -1,5 +1,5 @@
 import SchemaGenerator from '../schema-generator';
-import {format as fmt} from 'util';
+import { format as fmt } from 'util';
 
 // This function is required in the database
 
@@ -66,8 +66,8 @@ export default class Postgres extends SchemaGenerator {
   primaryKey(table) {
     if (table.columns[0].type === 'pk') {
       return fmt('CONSTRAINT %s PRIMARY KEY (%s)',
-                 this.primaryKeyName(table),
-                 table.columns[0].name);
+        this.primaryKeyName(table),
+        table.columns[0].name);
     }
 
     return '';
@@ -76,8 +76,8 @@ export default class Postgres extends SchemaGenerator {
   primarySequenceKey(table) {
     if (table.columns[0].type === 'pk') {
       return fmt('CONSTRAINT %s PRIMARY KEY (%s)',
-                 this.primaryKeyName(table),
-                 table.columns[0].name);
+        this.primaryKeyName(table),
+        table.columns[0].name);
     }
 
     return '';
@@ -85,8 +85,8 @@ export default class Postgres extends SchemaGenerator {
 
   createTable(change) {
     return fmt('CREATE TABLE IF NOT EXISTS %s (\n  %s\n);',
-               this.tableName(change.newTable),
-               this.columnsForTable(change.newTable).concat(this.primaryKey(change.newTable)).join(',\n  '));
+      this.tableName(change.newTable),
+      this.columnsForTable(change.newTable).concat(this.primaryKey(change.newTable)).join(',\n  '));
   }
 
   createIndex(change) {
@@ -98,7 +98,7 @@ export default class Postgres extends SchemaGenerator {
     const withClause = method === 'gin' ? ' WITH (fastupdate = off)' : '';
 
     return fmt('CREATE %sINDEX %s ON %s USING %s (%s)%s;',
-               unique, indexName, tableName, method, columns, withClause);
+      unique, indexName, tableName, method, columns, withClause);
   }
 
   dropView(change) {
@@ -107,21 +107,29 @@ export default class Postgres extends SchemaGenerator {
 
   dropTable(change) {
     return fmt('DROP TABLE IF EXISTS %s%s CASCADE;',
-               this.escapedSchema(),
-               this.escape(this.tablePrefix + change.oldTable.name));
+      this.escapedSchema(),
+      this.escape(this.tablePrefix + change.oldTable.name));
   }
 
   renameTable(change) {
     const parts = [ super.renameTable(change) ];
 
-    parts.push(fmt('ALTER TABLE %s RENAME CONSTRAINT %s TO %s;',
-                   this.tableName(change.newTable),
-                   this.primaryKeyName(change.oldTable),
-                   this.primaryKeyName(change.newTable)));
+    parts.push(
+      fmt(
+        'ALTER TABLE %s RENAME CONSTRAINT %s TO %s;',
+        this.tableName(change.newTable),
+        this.primaryKeyName(change.oldTable),
+        this.primaryKeyName(change.newTable)
+      )
+    );
 
-    parts.push(fmt('ALTER SEQUENCE %s RENAME TO %s;',
-                   this.escapedSchema() + this.primaryKeySequenceName(change.oldTable),
-                   this.primaryKeySequenceName(change.newTable)));
+    parts.push(
+      fmt(
+        'ALTER SEQUENCE %s RENAME TO %s;',
+        this.escapedSchema() + this.primaryKeySequenceName(change.oldTable),
+        this.primaryKeySequenceName(change.newTable)
+      )
+    );
 
     return parts;
   }
@@ -132,16 +140,25 @@ export default class Postgres extends SchemaGenerator {
     const viewDefinition = this.projectionForView(change.newView);
     const clause = change.newView.clause ? ' ' + change.newView.clause : '';
 
-    return fmt('CREATE OR REPLACE VIEW %s AS\nSELECT\n  %s\nFROM %s%s;',
-               viewName, viewDefinition.join(',\n  '), tableName, clause);
+    return fmt(
+      'CREATE OR REPLACE VIEW %s AS\nSELECT\n  %s\nFROM %s%s;',
+      viewName,
+      viewDefinition.join(',\n  '),
+      tableName,
+      clause
+    );
   }
 
   insertInto(into, from) {
     const parts = [ super.insertInto(into, from) ];
 
-    parts.push(fmt("SELECT setval('%s', (SELECT MAX(id) FROM %s));",
-                   this.escapedSchema() + this.primaryKeySequenceName(into),
-                   this.tableName(into)));
+    parts.push(
+      fmt(
+        "SELECT setval('%s', (SELECT MAX(id) FROM %s));",
+        this.escapedSchema() + this.primaryKeySequenceName(into),
+        this.tableName(into)
+      )
+    );
 
     return parts;
   }

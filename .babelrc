@@ -1,3 +1,6 @@
 {
-  "presets": ["es2015", "stage-3"]
+  "presets": [],
+  "plugins": [
+    "@babel/plugin-transform-modules-commonjs"
+  ]
 }

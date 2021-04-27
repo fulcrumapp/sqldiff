@@ -1,5 +1,5 @@
 import SchemaGenerator from '../schema-generator';
-import {format as fmt} from 'util';
+import { format as fmt} from 'util';
 
 const TYPES = {
   pk: 'INTEGER PRIMARY KEY AUTOINCREMENT',
@@ -14,7 +14,7 @@ const TYPES = {
   timestamp: 'REAL'
 };
 
-export default class Sqlite extends SchemaGenerator {
+export default class SQLite extends SchemaGenerator {
   typeForColumn(column) {
     return TYPES[column.type] || 'TEXT';
   }
@@ -28,23 +28,27 @@ export default class Sqlite extends SchemaGenerator {
   }
 
   transformToDouble(columnName) {
-    return fmt('(CASE ' +
-               'WHEN LENGTH(TRIM(%s)) = 0 THEN NULL ' +
-               'WHEN CAST(%s AS REAL) = 0 AND ' +
-               "LENGTH(TRIM(REPLACE(REPLACE(REPLACE(%s, '.', ''), '0', ' '), '-', ''))) > 0 THEN NULL " +
-               'ELSE CAST(%s AS REAL) ' +
-               'END)',
-               columnName, columnName, columnName, columnName);
+    return fmt(
+      '(CASE ' +
+      'WHEN LENGTH(TRIM(%s)) = 0 THEN NULL ' +
+      'WHEN CAST(%s AS REAL) = 0 AND ' +
+      "LENGTH(TRIM(REPLACE(REPLACE(REPLACE(%s, '.', ''), '0', ' '), '-', ''))) > 0 THEN NULL " +
+      'ELSE CAST(%s AS REAL) ' +
+      'END)',
+      columnName, columnName, columnName, columnName
+    );
   }
 
   createIndex(change) {
     const unique = change.unique ? 'UNIQUE ' : '';
 
-    return fmt('CREATE %sINDEX IF NOT EXISTS %s ON %s (%s);',
-               unique,
-               this.indexName(change.newTable, change.columns),
-               this.tableName(change.newTable),
-               change.columns.join(', '));
+    return fmt(
+      'CREATE %sINDEX IF NOT EXISTS %s ON %s (%s);',
+      unique,
+      this.indexName(change.newTable, change.columns),
+      this.tableName(change.newTable),
+      change.columns.join(', ')
+    );
   }
 
   escape(identifier) {
