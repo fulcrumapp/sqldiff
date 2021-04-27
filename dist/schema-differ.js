@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _underscore = require("underscore");
+var _lodash = require("lodash");
 
 var _schemaChange = _interopRequireDefault(require("./schema-change"));
 
@@ -41,7 +41,7 @@ class SchemaDiff {
         let newTable = null;
 
         if (newTables) {
-          newTable = (0, _underscore.find)(newTables, t => t.id === oldTable.id);
+          newTable = (0, _lodash.find)(newTables, t => t.id === oldTable.id);
         }
 
         if (newTable) {
@@ -64,7 +64,7 @@ class SchemaDiff {
         let oldTable = null;
 
         if (oldTables) {
-          oldTable = (0, _underscore.find)(oldTables, t => t.id === newTable.id);
+          oldTable = (0, _lodash.find)(oldTables, t => t.id === newTable.id);
         }
 
         if (!oldTable) {
@@ -79,14 +79,14 @@ class SchemaDiff {
   conflate() {
     // if we're re-creating a table, we don't need to rename, drop, or add any new columns because
     // the recreate handles all of those.
-    const recreates = (0, _underscore.select)(this.changes, change => change.type === 'recreate-table');
-    const ids = (0, _underscore.map)(recreates, change => change.newTable.id);
-    this.changes = (0, _underscore.reject)(this.changes, change => {
-      const isSimpleChange = (0, _underscore.contains)(['rename-column', 'drop-column', 'add-column'], change.type);
+    const recreates = (0, _lodash.filter)(this.changes, change => change.type === 'recreate-table');
+    const ids = (0, _lodash.map)(recreates, change => change.newTable.id);
+    this.changes = (0, _lodash.reject)(this.changes, change => {
+      const isSimpleChange = (0, _lodash.includes)(['rename-column', 'drop-column', 'add-column'], change.type);
       let isTableAlreadyBeingRecreated = false;
 
       if (change.newTable) {
-        isTableAlreadyBeingRecreated = (0, _underscore.contains)(ids, change.newTable.id);
+        isTableAlreadyBeingRecreated = (0, _lodash.includes)(ids, change.newTable.id);
       }
 
       return isSimpleChange && isTableAlreadyBeingRecreated;
@@ -102,7 +102,7 @@ class SchemaDiff {
         let oldTable = null;
 
         if (this.oldSchema) {
-          oldTable = (0, _underscore.find)(this.oldSchema.tables, t => t.id === newTable.id);
+          oldTable = (0, _lodash.find)(this.oldSchema.tables, t => t.id === newTable.id);
         }
 
         return {
@@ -113,7 +113,7 @@ class SchemaDiff {
     } // only process column-level changes on tables that exist already
 
 
-    pairs = (0, _underscore.filter)(pairs, pair => {
+    pairs = (0, _lodash.filter)(pairs, pair => {
       return pair.oldTable && pair.newTable && pair.oldTable.id === pair.newTable.id;
     });
     return pairs;
@@ -128,7 +128,7 @@ class SchemaDiff {
         let oldView = null;
 
         if (this.oldSchema) {
-          oldView = (0, _underscore.find)(this.oldSchema.views, t => t.id === newView.id);
+          oldView = (0, _lodash.find)(this.oldSchema.views, t => t.id === newView.id);
         }
 
         return {
@@ -139,7 +139,7 @@ class SchemaDiff {
     } // only process column-level changes on views that exist already
 
 
-    pairs = (0, _underscore.filter)(pairs, pair => {
+    pairs = (0, _lodash.filter)(pairs, pair => {
       return pair.oldView && pair.newView && pair.oldView.id === pair.newView.id;
     });
     return pairs;
@@ -169,7 +169,7 @@ class SchemaDiff {
             // to be taken.
             if (oldIndex !== newIndex || !newColumn.isEqualTo(oldColumn)) {
               // column reordering requires rebuilding the entire table, 1 per table
-              if (!(0, _underscore.contains)(recreatedTableIdentifiers, pair.newTable.id)) {
+              if (!(0, _lodash.includes)(recreatedTableIdentifiers, pair.newTable.id)) {
                 this.addChange('recreate-table', {
                   oldTable: pair.oldTable,
                   newTable: pair.newTable
@@ -232,7 +232,7 @@ class SchemaDiff {
         let newView = null;
 
         if (newViews) {
-          newView = (0, _underscore.find)(newViews, t => t.id === oldView.id);
+          newView = (0, _lodash.find)(newViews, t => t.id === oldView.id);
         }
 
         if (newView) {
@@ -257,7 +257,7 @@ class SchemaDiff {
         let oldView = null;
 
         if (oldViews) {
-          oldView = (0, _underscore.find)(oldViews, t => t.id === newView.id);
+          oldView = (0, _lodash.find)(oldViews, t => t.id === newView.id);
         }
 
         if (!oldView) {
@@ -327,7 +327,7 @@ class SchemaDiff {
       }
 
       if (needsRebuild) {
-        if (!(0, _underscore.contains)(recreatedViewIdentifiers, pair.newView.id)) {
+        if (!(0, _lodash.includes)(recreatedViewIdentifiers, pair.newView.id)) {
           this.addChange('drop-view', {
             oldView: pair.oldView
           });

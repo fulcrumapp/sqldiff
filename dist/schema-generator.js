@@ -34,7 +34,7 @@ class SchemaGenerator {
       this.options.beforeTransform(this, changes);
     }
 
-    const columnRenamesAndDrops = (0, _lodash.select)(this.changes, change => {
+    const columnRenamesAndDrops = (0, _lodash.filter)(this.changes, change => {
       return change.type === 'drop-column' || change.type === 'rename-column';
     });
     let tablesWithColumnDrops = (0, _lodash.map)(columnRenamesAndDrops, change => {
@@ -49,11 +49,11 @@ class SchemaGenerator {
     const viewChanges = [];
 
     for (const change of this.changes) {
-      const isSimpleChange = (0, _lodash.contains)(['add-column', 'drop-column', 'rename-column'], change.type);
-      const shouldReplaceWithRecreate = isSimpleChange && (0, _lodash.contains)(tablesIdentifiersWithColumnDrops, change.newTable.id);
+      const isSimpleChange = (0, _lodash.includes)(['add-column', 'drop-column', 'rename-column'], change.type);
+      const shouldReplaceWithRecreate = isSimpleChange && (0, _lodash.includes)(tablesIdentifiersWithColumnDrops, change.newTable.id);
 
       if (!shouldReplaceWithRecreate) {
-        if ((0, _lodash.contains)(['drop-view', 'create-view'], change.type)) {
+        if ((0, _lodash.includes)(['drop-view', 'create-view'], change.type)) {
           viewChanges.push(change);
         } else {
           changes.push(change);
@@ -64,7 +64,7 @@ class SchemaGenerator {
     const ids = [];
 
     for (const drop of columnRenamesAndDrops) {
-      if (!(0, _lodash.contains)(ids, drop.newTable.id)) {
+      if (!(0, _lodash.includes)(ids, drop.newTable.id)) {
         changes.push(new _schemaChange.default('recreate-table', {
           oldTable: drop.oldTable,
           newTable: drop.newTable
@@ -323,7 +323,7 @@ class SchemaGenerator {
 
   processIndexes(changes) {
     for (const change of changes) {
-      if ((0, _lodash.contains)(['create-table', 'recreate-table'], change.type)) {
+      if ((0, _lodash.includes)(['create-table', 'recreate-table'], change.type)) {
         for (const index of change.newTable.indexes) {
           changes.push(new _schemaChange.default('create-index', {
             newTable: change.newTable,

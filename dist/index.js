@@ -24,7 +24,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = {
   View: _view.default,
   Table: _table.default,
-  Sqlite: _sqlite.default,
+  SQLite: _sqlite.default,
   Postgres: _postgres.default,
   MSSQL: _mssql.default,
   SchemaDiffer: _schemaDiffer.default,

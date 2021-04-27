@@ -24,7 +24,7 @@ const TYPES = {
   timestamp: 'REAL'
 };
 
-class Sqlite extends _schemaGenerator.default {
+class SQLite extends _schemaGenerator.default {
   typeForColumn(column) {
     return TYPES[column.type] || 'TEXT';
   }
@@ -56,5 +56,5 @@ class Sqlite extends _schemaGenerator.default {
 
 }
 
-exports.default = Sqlite;
+exports.default = SQLite;
 //# sourceMappingURL=sqlite.js.map
