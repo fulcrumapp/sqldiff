@@ -40,7 +40,6 @@
     "no-dupe-keys": 2,
     "no-duplicate-case": 2,
     "no-empty-character-class": 2,
-    "no-empty-label": 2,
     "no-eval": 2,
     "no-extra-boolean-cast": 2,
     "no-extra-parens": [2, "functions"],
@@ -112,13 +111,10 @@
     "radix": 2,
     "semi": [2, "always"],
     "semi-spacing": [2, {"before": false, "after": true}],
-    "space-after-keywords": [2, "always"],
     "space-before-blocks": 2,
-    "space-before-keywords": [2, "always"],
     "space-before-function-paren": [2, { "anonymous": "always", "named": "never" }],
     "space-in-parens": [2, "never"],
     "space-infix-ops": 2,
-    "space-return-throw-case": 2,
     "space-unary-ops": [2, { "words": true, "nonwords": false }],
     "spaced-comment": [2, "always", { "exceptions": ["-", "+"] }],
     "strict": [2, "global"],
@@ -127,10 +123,6 @@
     "valid-typeof": 2,
     "wrap-iife": 2,
     "yoda": [2, "never"]
-  },
-  "ecmaFeatures": {
-    "modules": true,
-    "experimentalObjectRestSpread": true
   },
   "env": {
     "browser": false,
@@ -144,5 +136,8 @@
     "window": false
   },
   "extends": "eslint:recommended",
-  "parser": "babel-eslint"
+  "parser": "@babel/eslint-parser",
+  "plugins": [
+    "@babel"
+  ]
 }

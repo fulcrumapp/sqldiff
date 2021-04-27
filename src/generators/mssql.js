@@ -1,5 +1,5 @@
 import SchemaGenerator from '../schema-generator';
-import {format as fmt} from 'util';
+import { format as fmt } from 'util';
 
 const TYPES = {
   pk: 'bigint NOT NULL IDENTITY(1,1) PRIMARY KEY',
@@ -26,7 +26,7 @@ export default class MSSQL extends SchemaGenerator {
   }
 
   unescape(identifier) {
-    return identifier.replace(/[\[\]]/g, '');
+    return identifier.replace(/[[\]]/g, '');
   }
 
   typeForColumn(column) {
@@ -53,14 +53,14 @@ export default class MSSQL extends SchemaGenerator {
 
   createTable(change) {
     return fmt('CREATE TABLE %s (\n  %s\n);',
-               this.tableName(change.newTable),
-               this.columnsForTable(change.newTable).join(',\n  '));
+      this.tableName(change.newTable),
+      this.columnsForTable(change.newTable).join(',\n  '));
   }
 
   addColumn(change) {
     return fmt('ALTER TABLE %s ADD %s;',
-               this.tableName(change.newTable),
-               this.columnDefinition(change.column));
+      this.tableName(change.newTable),
+      this.columnDefinition(change.column));
   }
 
   createView(change) {
@@ -77,10 +77,10 @@ export default class MSSQL extends SchemaGenerator {
     }
 
     return fmt('CREATE VIEW %s AS\nSELECT\n  %s\nFROM %s%s;',
-               this.viewName(change.newView),
-               this.projectionForView(change.newView).join(',\n  '),
-               this.tableName(change.newView.table),
-               whereClause);
+      this.viewName(change.newView),
+      this.projectionForView(change.newView).join(',\n  '),
+      this.tableName(change.newView.table),
+      whereClause);
   }
 
   createIndex(change) {
@@ -93,35 +93,43 @@ export default class MSSQL extends SchemaGenerator {
     const spatial = method === 'spatial' ? ' SPATIAL' : '';
 
     return fmt('CREATE%s %sINDEX %s ON %s (%s);',
-               spatial, unique, indexName, tableName, columns);
+      spatial, unique, indexName, tableName, columns);
   }
 
   dropView(change) {
-    return fmt("IF OBJECT_ID('%s%s', 'V') IS NOT NULL DROP VIEW %s%s;",
-               this.escapedSchema(),
-               this.escape(this.tablePrefix + change.oldView.name),
-               this.escapedSchema(),
-               this.escape(this.tablePrefix + change.oldView.name));
+    return fmt(
+      "IF OBJECT_ID('%s%s', 'V') IS NOT NULL DROP VIEW %s%s;",
+      this.escapedSchema(),
+      this.escape(this.tablePrefix + change.oldView.name),
+      this.escapedSchema(),
+      this.escape(this.tablePrefix + change.oldView.name)
+    );
   }
 
   dropTable(change) {
-    return fmt("IF OBJECT_ID('%s%s', 'U') IS NOT NULL DROP TABLE %s%s;",
-               this.escapedSchema(),
-               this.escape(this.tablePrefix + change.oldTable.name),
-               this.escapedSchema(),
-               this.escape(this.tablePrefix + change.oldTable.name));
+    return fmt(
+      "IF OBJECT_ID('%s%s', 'U') IS NOT NULL DROP TABLE %s%s;",
+      this.escapedSchema(),
+      this.escape(this.tablePrefix + change.oldTable.name),
+      this.escapedSchema(),
+      this.escape(this.tablePrefix + change.oldTable.name)
+    );
   }
 
   renameTable(change) {
-    return fmt('EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';',
-       this.unescape(this.tableName(change.oldTable)),
-       this.tablePrefix + change.newTable.name);
+    return fmt(
+      'EXEC sp_rename \'%s\', \'%s\', \'OBJECT\';',
+      this.unescape(this.tableName(change.oldTable)),
+      this.tablePrefix + change.newTable.name
+    );
   }
 
   renameColumn(change) {
-    return fmt('EXEC sp_rename \'%s\', \'%s\', \'COLUMN\';',
-       [this.unescape(this.tableName(change.newTable)), change.oldColumn.name].join('.'),
-       change.newColumn.name);
+    return fmt(
+      'EXEC sp_rename \'%s\', \'%s\', \'COLUMN\';',
+      [this.unescape(this.tableName(change.newTable)), change.oldColumn.name].join('.'),
+      change.newColumn.name
+    );
   }
 
   insertInto(into, from) {

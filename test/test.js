@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { flatten } from 'lodash';
 import fs from 'fs';
 import chai from 'chai';
 import glob from 'glob';
@@ -14,7 +14,7 @@ chai.should();
 
 const dumpScript = function (scripts) {
   console.log('----------------------------------');
-  console.log(_.flatten(scripts).join('\n\n'));
+  console.log(flatten(scripts).join('\n\n'));
   console.log('----------------------------------');
 };
 
