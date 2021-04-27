@@ -8,7 +8,7 @@ import Table from '../src/table';
 import View from '../src/view';
 import SchemaDiffer from '../src/schema-differ';
 import Postgres from '../src/generators/postgres';
-import Sqlite from '../src/generators/sqlite';
+import SQLite from '../src/generators/sqlite';
 import MSSQL from '../src/generators/mssql';
 
 chai.should();
@@ -81,13 +81,13 @@ function generatePostgres(differ) {
   return generator.generate().join('\n').trim();
 }
 
-function generateSqlite(differ) {
-  const generator = new Sqlite(differ);
+function generateSQLite(differ) {
+  const generator = new SQLite(differ);
   generator.tablePrefix = 'account_1_';
   return generator.generate().join('\n').trim();
 }
 
-function generateMssql(differ) {
+function generateMSSQL(differ) {
   const generator = new MSSQL(differ);
   generator.tablePrefix = 'account_1_';
   return generator.generate().join('\n').trim();
@@ -124,8 +124,8 @@ function run(testPath) {
     );
 
     const pg = generatePostgres(differ);
-    const sqlite = generateSqlite(differ);
-    const mssql = generateMssql(differ);
+    const sqlite = generateSQLite(differ);
+    const mssql = generateMSSQL(differ);
 
     pg.should.eql(spec.postgres);
     sqlite.should.eql(spec.sqlite);

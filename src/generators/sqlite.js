@@ -14,7 +14,7 @@ const TYPES = {
   timestamp: 'REAL'
 };
 
-export default class Sqlite extends SchemaGenerator {
+export default class SQLite extends SchemaGenerator {
   typeForColumn(column) {
     return TYPES[column.type] || 'TEXT';
   }
