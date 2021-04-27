@@ -17,6 +17,19 @@ new: [
   ] ]
 ]
 
+newViews: [
+  [
+    'users_view'
+    'users_view',
+    'users',
+    {},
+    [
+      [ 'id', 'integer', 'id' ]
+      [ 'name', 'string', 'user_name' ]
+    ]
+  ]
+]
+
 diff: [
   [ type: 'create-table' ]
 ]
@@ -33,6 +46,12 @@ CREATE TABLE IF NOT EXISTS organization_1.users (
   created_at timestamp with time zone NOT NULL,
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );
+DROP VIEW IF EXISTS organization_1.users_view CASCADE;
+CREATE OR REPLACE VIEW organization_1.users_view AS
+SELECT
+  id AS id,
+  name AS user_name
+FROM organization_1.users;
 '''
 
 sqlite: '''
@@ -46,6 +65,12 @@ CREATE TABLE IF NOT EXISTS `account_1_users` (
   `desc` TEXT,
   `created_at` REAL NOT NULL
 );
+DROP VIEW IF EXISTS `account_1_users_view`;
+CREATE VIEW IF NOT EXISTS `account_1_users_view` AS
+SELECT
+  `id` AS `id`,
+  `name` AS `user_name`
+FROM `account_1_users`;
 '''
 
 mssql: '''
@@ -59,4 +84,10 @@ CREATE TABLE [account_1_users] (
   [desc] varchar(max),
   [created_at] datetime NOT NULL
 );
+IF OBJECT_ID('[account_1_users_view]', 'V') IS NOT NULL DROP VIEW [account_1_users_view];
+CREATE VIEW [account_1_users_view] AS
+SELECT
+  [id] AS [id],
+  [name] AS [user_name]
+FROM [account_1_users];
 '''

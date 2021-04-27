@@ -1,6 +1,6 @@
 import { flatten, find, filter, map, uniq, includes, isArray } from 'lodash';
 import SchemaChange from './schema-change';
-import {format as fmt} from 'util';
+import { format as fmt } from 'util';
 
 export default class SchemaGenerator {
   constructor(differ, options) {
