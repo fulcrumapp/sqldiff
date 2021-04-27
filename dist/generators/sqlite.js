@@ -3,58 +3,71 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
 
 var _schemaGenerator = _interopRequireDefault(require("../schema-generator"));
 
 var _util = require("util");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-const TYPES = {
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var TYPES = {
   pk: 'INTEGER PRIMARY KEY AUTOINCREMENT',
   string: 'TEXT',
   integer: 'INTEGER',
   date: 'REAL',
   time: 'REAL',
-  double: 'REAL',
+  "double": 'REAL',
   array: 'TEXT',
   json: 'TEXT',
-  boolean: 'INTEGER',
+  "boolean": 'INTEGER',
   timestamp: 'REAL'
 };
 
-class SQLite extends _schemaGenerator.default {
-  typeForColumn(column) {
+var SQLite = /*#__PURE__*/function (_SchemaGenerator) {
+  _inheritsLoose(SQLite, _SchemaGenerator);
+
+  function SQLite() {
+    return _SchemaGenerator.apply(this, arguments) || this;
+  }
+
+  var _proto = SQLite.prototype;
+
+  _proto.typeForColumn = function typeForColumn(column) {
     return TYPES[column.type] || 'TEXT';
-  }
+  };
 
-  transformToText(columnName) {
+  _proto.transformToText = function transformToText(columnName) {
     return (0, _util.format)('CAST(%s AS text)', columnName);
-  }
+  };
 
-  transformToDate(columnName) {
+  _proto.transformToDate = function transformToDate(columnName) {
     return this.transformToText(columnName);
-  }
+  };
 
-  transformToDouble(columnName) {
+  _proto.transformToDouble = function transformToDouble(columnName) {
     return (0, _util.format)('(CASE ' + 'WHEN LENGTH(TRIM(%s)) = 0 THEN NULL ' + 'WHEN CAST(%s AS REAL) = 0 AND ' + "LENGTH(TRIM(REPLACE(REPLACE(REPLACE(%s, '.', ''), '0', ' '), '-', ''))) > 0 THEN NULL " + 'ELSE CAST(%s AS REAL) ' + 'END)', columnName, columnName, columnName, columnName);
-  }
+  };
 
-  createIndex(change) {
-    const unique = change.unique ? 'UNIQUE ' : '';
+  _proto.createIndex = function createIndex(change) {
+    var unique = change.unique ? 'UNIQUE ' : '';
     return (0, _util.format)('CREATE %sINDEX IF NOT EXISTS %s ON %s (%s);', unique, this.indexName(change.newTable, change.columns), this.tableName(change.newTable), change.columns.join(', '));
-  }
+  };
 
-  escape(identifier) {
+  _proto.escape = function escape(identifier) {
     if (identifier == null || identifier.length === 0) {
       return '';
     }
 
     return '`' + identifier + '`';
-  }
+  };
 
-}
+  return SQLite;
+}(_schemaGenerator["default"]);
 
-exports.default = SQLite;
+exports["default"] = SQLite;
 //# sourceMappingURL=sqlite.js.map

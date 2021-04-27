@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
 
 var _lodash = require("lodash");
 
@@ -11,10 +11,16 @@ var _schemaChange = _interopRequireDefault(require("./schema-change"));
 
 var _util = require("util");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-class SchemaGenerator {
-  constructor(differ, options) {
+function _createForOfIteratorHelperLoose(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (it) return (it = it.call(o)).next.bind(it); if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var SchemaGenerator = /*#__PURE__*/function () {
+  function SchemaGenerator(differ, options) {
     this.differ = differ;
     this.changes = differ.diff();
     this.options = options != null ? options : {};
@@ -22,35 +28,38 @@ class SchemaGenerator {
     this.tablePrefix = '';
   }
 
-  generate() {
+  var _proto = SchemaGenerator.prototype;
+
+  _proto.generate = function generate() {
     this.schemaChanges = (0, _lodash.flatten)((0, _lodash.map)(this.transform(), this.statementForChange.bind(this)));
     return this.schemaChanges;
-  }
+  };
 
-  transform() {
-    const changes = [];
+  _proto.transform = function transform() {
+    var changes = [];
 
     if (this.options.beforeTransform) {
       this.options.beforeTransform(this, changes);
     }
 
-    const columnRenamesAndDrops = (0, _lodash.filter)(this.changes, change => {
+    var columnRenamesAndDrops = (0, _lodash.filter)(this.changes, function (change) {
       return change.type === 'drop-column' || change.type === 'rename-column';
     });
-    let tablesWithColumnDrops = (0, _lodash.map)(columnRenamesAndDrops, change => {
+    var tablesWithColumnDrops = (0, _lodash.map)(columnRenamesAndDrops, function (change) {
       return change.newTable;
     });
-    tablesWithColumnDrops = (0, _lodash.uniq)(tablesWithColumnDrops, false, table => {
+    tablesWithColumnDrops = (0, _lodash.uniq)(tablesWithColumnDrops, false, function (table) {
       return table.id;
     });
-    const tablesIdentifiersWithColumnDrops = (0, _lodash.map)(tablesWithColumnDrops, table => {
+    var tablesIdentifiersWithColumnDrops = (0, _lodash.map)(tablesWithColumnDrops, function (table) {
       return table.id;
     });
-    const viewChanges = [];
+    var viewChanges = [];
 
-    for (const change of this.changes) {
-      const isSimpleChange = (0, _lodash.includes)(['add-column', 'drop-column', 'rename-column'], change.type);
-      const shouldReplaceWithRecreate = isSimpleChange && (0, _lodash.includes)(tablesIdentifiersWithColumnDrops, change.newTable.id);
+    for (var _iterator = _createForOfIteratorHelperLoose(this.changes), _step; !(_step = _iterator()).done;) {
+      var change = _step.value;
+      var isSimpleChange = (0, _lodash.includes)(['add-column', 'drop-column', 'rename-column'], change.type);
+      var shouldReplaceWithRecreate = isSimpleChange && (0, _lodash.includes)(tablesIdentifiersWithColumnDrops, change.newTable.id);
 
       if (!shouldReplaceWithRecreate) {
         if ((0, _lodash.includes)(['drop-view', 'create-view'], change.type)) {
@@ -61,11 +70,13 @@ class SchemaGenerator {
       }
     }
 
-    const ids = [];
+    var ids = [];
 
-    for (const drop of columnRenamesAndDrops) {
+    for (var _iterator2 = _createForOfIteratorHelperLoose(columnRenamesAndDrops), _step2; !(_step2 = _iterator2()).done;) {
+      var drop = _step2.value;
+
       if (!(0, _lodash.includes)(ids, drop.newTable.id)) {
-        changes.push(new _schemaChange.default('recreate-table', {
+        changes.push(new _schemaChange["default"]('recreate-table', {
           oldTable: drop.oldTable,
           newTable: drop.newTable
         }));
@@ -82,9 +93,9 @@ class SchemaGenerator {
     }
 
     return changes;
-  }
+  };
 
-  statementForChange(change) {
+  _proto.statementForChange = function statementForChange(change) {
     switch (change.type) {
       case 'create-table':
         return this.createTable(change);
@@ -119,28 +130,28 @@ class SchemaGenerator {
       default:
         throw new Error('Invalid change type ' + change.type);
     }
-  }
+  };
 
-  escape(identifier) {
+  _proto.escape = function escape(identifier) {
     if (identifier == null || identifier.length === 0) {
       return '';
     }
 
-    const needsQuotes = /[^_A-Z0-9]/i.test(identifier) || /^[0-9]/.test(identifier);
+    var needsQuotes = /[^_A-Z0-9]/i.test(identifier) || /^[0-9]/.test(identifier);
 
     if (needsQuotes) {
       return '"' + identifier.replace(/"/g, '""') + '"';
     }
 
     return identifier;
-  }
+  };
 
-  columnDefinition(column) {
+  _proto.columnDefinition = function columnDefinition(column) {
     return this.escape(column.name) + ' ' + this.typeForColumn(column) + this.columnModifiers(column);
-  }
+  };
 
-  columnModifiers(column) {
-    const mods = [];
+  _proto.columnModifiers = function columnModifiers(column) {
+    var mods = [];
 
     if (column.allowNull === false) {
       mods.push(' NOT NULL');
@@ -151,22 +162,24 @@ class SchemaGenerator {
     }
 
     return mods.join('');
-  }
+  };
 
-  columnsForTable(table) {
+  _proto.columnsForTable = function columnsForTable(table) {
     return (0, _lodash.map)(table.columns, this.columnDefinition.bind(this));
-  }
+  };
 
-  projectionForTable(table) {
-    return (0, _lodash.map)(table.columns, column => {
+  _proto.projectionForTable = function projectionForTable(table) {
+    return (0, _lodash.map)(table.columns, function (column) {
       return column.name;
     });
-  }
+  };
 
-  projectionForView(view) {
-    const parts = [];
+  _proto.projectionForView = function projectionForView(view) {
+    var parts = [];
 
-    for (const reference of view.columns) {
+    for (var _iterator3 = _createForOfIteratorHelperLoose(view.columns), _step3; !(_step3 = _iterator3()).done;) {
+      var reference = _step3.value;
+
       if (reference.raw) {
         parts.push(reference.raw);
       } else {
@@ -175,13 +188,14 @@ class SchemaGenerator {
     }
 
     return parts;
-  }
+  };
 
-  mappingForTables(oldTable, newTable) {
-    const mappings = [];
+  _proto.mappingForTables = function mappingForTables(oldTable, newTable) {
+    var mappings = [];
 
-    for (const newColumn of newTable.columns) {
-      const oldColumn = (0, _lodash.find)(oldTable.columns, function (column) {
+    var _loop = function _loop() {
+      var newColumn = _step4.value;
+      var oldColumn = (0, _lodash.find)(oldTable.columns, function (column) {
         return column.id === newColumn.id;
       });
 
@@ -191,35 +205,39 @@ class SchemaGenerator {
           newColumn: newColumn
         });
       }
+    };
+
+    for (var _iterator4 = _createForOfIteratorHelperLoose(newTable.columns), _step4; !(_step4 = _iterator4()).done;) {
+      _loop();
     }
 
     return mappings;
-  }
+  };
 
-  escapedSchema() {
+  _proto.escapedSchema = function escapedSchema() {
     if (this.tableSchema == null || this.tableSchema.length === 0) {
       return '';
     }
 
     return this.escape(this.tableSchema) + '.';
-  }
+  };
 
-  createTable(change) {
+  _proto.createTable = function createTable(change) {
     return (0, _util.format)('CREATE TABLE IF NOT EXISTS %s (\n  %s\n);', this.tableName(change.newTable), this.columnsForTable(change.newTable).join(',\n  '));
-  }
+  };
 
-  raw(change) {
+  _proto.raw = function raw(change) {
     return change.sql;
-  }
+  };
 
-  recreateTable(change) {
-    const newTableName = change.newTable.name;
-    const oldTableName = change.oldTable.name;
-    const newTemporaryTableName = 'tmp_new_' + newTableName;
-    const oldTemporaryTableName = 'tmp_old_' + oldTableName;
-    const parts = [];
+  _proto.recreateTable = function recreateTable(change) {
+    var newTableName = change.newTable.name;
+    var oldTableName = change.oldTable.name;
+    var newTemporaryTableName = 'tmp_new_' + newTableName;
+    var oldTemporaryTableName = 'tmp_old_' + oldTableName;
+    var parts = [];
 
-    const append = value => {
+    var append = function append(value) {
       parts.push.apply(parts, (0, _lodash.isArray)(value) ? value : [value]);
     };
 
@@ -255,77 +273,86 @@ class SchemaGenerator {
       }
     }));
     return parts;
-  }
+  };
 
-  insertInto(into, from) {
-    const mappings = this.mappingForTables(from, into);
-    const newColumns = (0, _lodash.map)(mappings, pair => {
-      return this.escape(pair.newColumn.name);
+  _proto.insertInto = function insertInto(into, from) {
+    var _this = this;
+
+    var mappings = this.mappingForTables(from, into);
+    var newColumns = (0, _lodash.map)(mappings, function (pair) {
+      return _this.escape(pair.newColumn.name);
     });
-    const oldColumns = (0, _lodash.map)(mappings, column => {
+    var oldColumns = (0, _lodash.map)(mappings, function (column) {
       // handle data type changes
       if (column.oldColumn.type !== 'double' && column.newColumn.type === 'double') {
-        return this.transformToDouble(this.escape(column.oldColumn.name));
+        return _this.transformToDouble(_this.escape(column.oldColumn.name));
       } else if (column.oldColumn.type === 'double' && column.newColumn.type !== 'double') {
-        return this.transformToText(this.escape(column.oldColumn.name));
+        return _this.transformToText(_this.escape(column.oldColumn.name));
       } else if (column.oldColumn.type !== 'date' && column.newColumn.type === 'date') {
-        return this.transformToDate(this.escape(column.oldColumn.name));
+        return _this.transformToDate(_this.escape(column.oldColumn.name));
       } else {
-        return this.escape(column.oldColumn.name);
+        return _this.escape(column.oldColumn.name);
       }
     });
     return (0, _util.format)('INSERT INTO %s (%s) SELECT %s FROM %s;', this.tableName(into), newColumns.join(', '), oldColumns.join(', '), this.tableName(from));
-  }
+  };
 
-  renameTable(change) {
+  _proto.renameTable = function renameTable(change) {
     return (0, _util.format)('ALTER TABLE %s RENAME TO %s;', this.tableName(change.oldTable), this.escape(this.tablePrefix + change.newTable.name));
-  }
+  };
 
-  dropTable(change) {
+  _proto.dropTable = function dropTable(change) {
     return (0, _util.format)('DROP TABLE IF EXISTS %s;', this.tableName(change.oldTable));
-  }
+  };
 
-  addColumn(change) {
+  _proto.addColumn = function addColumn(change) {
     return (0, _util.format)('ALTER TABLE %s ADD COLUMN %s;', this.tableName(change.newTable), this.columnDefinition(change.column));
-  }
+  };
 
-  dropColumn(change) {
+  _proto.dropColumn = function dropColumn(change) {
     return (0, _util.format)('ALTER TABLE %s DROP COLUMN %s;', this.tableName(change.newTable), this.escape(change.column));
-  }
+  };
 
-  renameColumn(change) {
+  _proto.renameColumn = function renameColumn(change) {
     return (0, _util.format)('ALTER TABLE %s RENAME COLUMN %s TO %s;', this.tableName(change.newTable), this.escape(change.oldColumn.name), this.escape(change.newColumn.name));
-  }
+  };
 
-  tableName(table) {
+  _proto.tableName = function tableName(table) {
     return this.escapedSchema() + this.escape(this.tablePrefix + table.name);
-  }
+  };
 
-  viewName(view) {
+  _proto.viewName = function viewName(view) {
     return this.escapedSchema() + this.escape(this.tablePrefix + view.name);
-  }
+  };
 
-  indexName(table, columns) {
+  _proto.indexName = function indexName(table, columns) {
     return this.escape('idx_' + this.tablePrefix + table.name + '_' + columns.join('_'));
-  }
+  };
 
-  dropView(change) {
+  _proto.dropView = function dropView(change) {
     return (0, _util.format)('DROP VIEW IF EXISTS %s;', this.viewName(change.oldView));
-  }
+  };
 
-  createView(change) {
+  _proto.createView = function createView(change) {
     return (0, _util.format)('CREATE VIEW IF NOT EXISTS %s AS\nSELECT\n  %s\nFROM %s%s;', this.viewName(change.newView), this.projectionForView(change.newView).join(',\n  '), this.tableName(change.newView.table), change.newView.clause ? ' ' + change.newView.clause : '');
-  }
+  };
 
-  createIndex(change) {
-    return (0, _util.format)('CREATE INDEX %s ON %s (%s);', this.indexName(change.newTable, change.columns), this.tableName(change.newTable), change.columns.map(c => this.escape(c)).join(', '));
-  }
+  _proto.createIndex = function createIndex(change) {
+    var _this2 = this;
 
-  processIndexes(changes) {
-    for (const change of changes) {
+    return (0, _util.format)('CREATE INDEX %s ON %s (%s);', this.indexName(change.newTable, change.columns), this.tableName(change.newTable), change.columns.map(function (c) {
+      return _this2.escape(c);
+    }).join(', '));
+  };
+
+  _proto.processIndexes = function processIndexes(changes) {
+    for (var _iterator5 = _createForOfIteratorHelperLoose(changes), _step5; !(_step5 = _iterator5()).done;) {
+      var change = _step5.value;
+
       if ((0, _lodash.includes)(['create-table', 'recreate-table'], change.type)) {
-        for (const index of change.newTable.indexes) {
-          changes.push(new _schemaChange.default('create-index', {
+        for (var _iterator6 = _createForOfIteratorHelperLoose(change.newTable.indexes), _step6; !(_step6 = _iterator6()).done;) {
+          var index = _step6.value;
+          changes.push(new _schemaChange["default"]('create-index', {
             newTable: change.newTable,
             columns: index.columns,
             method: index.method,
@@ -334,9 +361,10 @@ class SchemaGenerator {
         }
       }
     }
-  }
+  };
 
-}
+  return SchemaGenerator;
+}();
 
-exports.default = SchemaGenerator;
+exports["default"] = SchemaGenerator;
 //# sourceMappingURL=schema-generator.js.map

@@ -3,18 +3,16 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
 
-class SchemaChange {
-  constructor(type, options) {
-    this.type = type;
+var SchemaChange = function SchemaChange(type, options) {
+  this.type = type;
 
-    for (const key of Object.keys(options)) {
-      this[key] = options[key];
-    }
+  for (var _i = 0, _Object$keys = Object.keys(options); _i < _Object$keys.length; _i++) {
+    var key = _Object$keys[_i];
+    this[key] = options[key];
   }
+};
 
-}
-
-exports.default = SchemaChange;
+exports["default"] = SchemaChange;
 //# sourceMappingURL=schema-change.js.map

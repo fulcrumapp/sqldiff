@@ -3,21 +3,33 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
 
 var _lodash = require("lodash");
 
 var _schemaChange = _interopRequireDefault(require("./schema-change"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-class SchemaDiff {
-  constructor(oldSchema, newSchema) {
+function _createForOfIteratorHelperLoose(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (it) return (it = it.call(o)).next.bind(it); if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var SchemaDiff = /*#__PURE__*/function () {
+  function SchemaDiff(oldSchema, newSchema) {
     this.oldSchema = oldSchema;
     this.newSchema = newSchema;
   }
 
-  diff() {
+  var _proto = SchemaDiff.prototype;
+
+  _proto.diff = function diff() {
     this.changes = [];
     this.diffTables();
     this.diffColumns();
@@ -26,64 +38,84 @@ class SchemaDiff {
     this.rawChanges = this.changes.slice();
     this.conflate();
     return this.changes;
-  }
+  };
 
-  addChange(type, params) {
-    this.changes.push(new _schemaChange.default(type, params));
-  }
+  _proto.addChange = function addChange(type, params) {
+    this.changes.push(new _schemaChange["default"](type, params));
+  };
 
-  diffTables() {
-    const newTables = this.newSchema ? this.newSchema.tables : null;
-    const oldTables = this.oldSchema ? this.oldSchema.tables : null;
+  _proto.diffTables = function diffTables() {
+    var _this = this;
+
+    var newTables = this.newSchema ? this.newSchema.tables : null;
+    var oldTables = this.oldSchema ? this.oldSchema.tables : null;
 
     if (this.oldSchema) {
-      for (const oldTable of this.oldSchema.tables) {
-        let newTable = null;
+      var _loop = function _loop() {
+        var oldTable = _step.value;
+        var newTable = null;
 
         if (newTables) {
-          newTable = (0, _lodash.find)(newTables, t => t.id === oldTable.id);
+          newTable = (0, _lodash.find)(newTables, function (t) {
+            return t.id === oldTable.id;
+          });
         }
 
         if (newTable) {
           if (newTable.name !== oldTable.name) {
-            this.addChange('rename-table', {
+            _this.addChange('rename-table', {
               oldTable: oldTable,
               newTable: newTable
             });
           }
         } else {
-          this.addChange('drop-table', {
+          _this.addChange('drop-table', {
             oldTable: oldTable
           });
         }
+      };
+
+      for (var _iterator = _createForOfIteratorHelperLoose(this.oldSchema.tables), _step; !(_step = _iterator()).done;) {
+        _loop();
       }
     }
 
     if (this.newSchema) {
-      for (const newTable of this.newSchema.tables) {
-        let oldTable = null;
+      var _loop2 = function _loop2() {
+        var newTable = _step2.value;
+        var oldTable = null;
 
         if (oldTables) {
-          oldTable = (0, _lodash.find)(oldTables, t => t.id === newTable.id);
+          oldTable = (0, _lodash.find)(oldTables, function (t) {
+            return t.id === newTable.id;
+          });
         }
 
         if (!oldTable) {
-          this.addChange('create-table', {
+          _this.addChange('create-table', {
             newTable: newTable
           });
         }
+      };
+
+      for (var _iterator2 = _createForOfIteratorHelperLoose(this.newSchema.tables), _step2; !(_step2 = _iterator2()).done;) {
+        _loop2();
       }
     }
-  }
+  };
 
-  conflate() {
+  _proto.conflate = function conflate() {
     // if we're re-creating a table, we don't need to rename, drop, or add any new columns because
     // the recreate handles all of those.
-    const recreates = (0, _lodash.filter)(this.changes, change => change.type === 'recreate-table');
-    const ids = (0, _lodash.map)(recreates, change => change.newTable.id);
-    this.changes = (0, _lodash.reject)(this.changes, change => {
-      const isSimpleChange = (0, _lodash.includes)(['rename-column', 'drop-column', 'add-column'], change.type);
-      let isTableAlreadyBeingRecreated = false;
+    var recreates = (0, _lodash.filter)(this.changes, function (change) {
+      return change.type === 'recreate-table';
+    });
+    var ids = (0, _lodash.map)(recreates, function (change) {
+      return change.newTable.id;
+    });
+    this.changes = (0, _lodash.reject)(this.changes, function (change) {
+      var isSimpleChange = (0, _lodash.includes)(['rename-column', 'drop-column', 'add-column'], change.type);
+      var isTableAlreadyBeingRecreated = false;
 
       if (change.newTable) {
         isTableAlreadyBeingRecreated = (0, _lodash.includes)(ids, change.newTable.id);
@@ -91,77 +123,26 @@ class SchemaDiff {
 
       return isSimpleChange && isTableAlreadyBeingRecreated;
     });
-  }
+  };
 
-  get tablesPairsForColumnDiff() {
-    // only tables that exist in the old and new schemas should be diff'd for columns
-    let pairs = [];
-
-    if (this.newSchema) {
-      pairs = this.newSchema.tables.map(newTable => {
-        let oldTable = null;
-
-        if (this.oldSchema) {
-          oldTable = (0, _lodash.find)(this.oldSchema.tables, t => t.id === newTable.id);
-        }
-
-        return {
-          oldTable: oldTable,
-          newTable: newTable
-        };
-      });
-    } // only process column-level changes on tables that exist already
-
-
-    pairs = (0, _lodash.filter)(pairs, pair => {
-      return pair.oldTable && pair.newTable && pair.oldTable.id === pair.newTable.id;
-    });
-    return pairs;
-  }
-
-  get viewPairsForColumnDiff() {
-    // only views that exist in the old and new schemas should be diff'd
-    let pairs = [];
-
-    if (this.newSchema && this.newSchema.views) {
-      pairs = this.newSchema.views.map(newView => {
-        let oldView = null;
-
-        if (this.oldSchema) {
-          oldView = (0, _lodash.find)(this.oldSchema.views, t => t.id === newView.id);
-        }
-
-        return {
-          oldView: oldView,
-          newView: newView
-        };
-      });
-    } // only process column-level changes on views that exist already
-
-
-    pairs = (0, _lodash.filter)(pairs, pair => {
-      return pair.oldView && pair.newView && pair.oldView.id === pair.newView.id;
-    });
-    return pairs;
-  }
-
-  diffColumns() {
-    const tablePairs = this.tablesPairsForColumnDiff; // Some changes (like column re-ordering) require completely recreating the table.
+  _proto.diffColumns = function diffColumns() {
+    var tablePairs = this.tablesPairsForColumnDiff; // Some changes (like column re-ordering) require completely recreating the table.
     // Track the tables we've determined need to be re-created so we don't re-create
     // it multiple times for multiple column re-orderings on the same table.
 
-    const recreatedTableIdentifiers = [];
+    var recreatedTableIdentifiers = [];
 
-    for (const pair of tablePairs) {
-      const oldColumns = pair.oldTable ? pair.oldTable.columns : [];
-      const newColumns = pair.newTable ? pair.newTable.columns : [];
+    for (var _iterator3 = _createForOfIteratorHelperLoose(tablePairs), _step3; !(_step3 = _iterator3()).done;) {
+      var pair = _step3.value;
+      var oldColumns = pair.oldTable ? pair.oldTable.columns : [];
+      var newColumns = pair.newTable ? pair.newTable.columns : [];
 
-      for (let oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
-        const oldColumn = oldColumns[oldIndex];
-        let exists = false;
+      for (var oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
+        var oldColumn = oldColumns[oldIndex];
+        var exists = false;
 
-        for (let newIndex = 0; newIndex < newColumns.length; ++newIndex) {
-          const newColumn = newColumns[newIndex];
+        for (var newIndex = 0; newIndex < newColumns.length; ++newIndex) {
+          var newColumn = newColumns[newIndex];
 
           if (oldColumn.id === newColumn.id) {
             // The column still exists, but something could've changed about it.
@@ -200,94 +181,113 @@ class SchemaDiff {
         }
       }
 
-      for (let newIndex = 0; newIndex < newColumns.length; ++newIndex) {
-        const newColumn = newColumns[newIndex];
-        let exists = false;
+      for (var _newIndex = 0; _newIndex < newColumns.length; ++_newIndex) {
+        var _newColumn = newColumns[_newIndex];
+        var _exists = false;
 
-        for (let oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
-          const oldColumn = oldColumns[oldIndex];
+        for (var _oldIndex = 0; _oldIndex < oldColumns.length; ++_oldIndex) {
+          var _oldColumn = oldColumns[_oldIndex];
 
-          if (oldColumn.id === newColumn.id) {
-            exists = true;
+          if (_oldColumn.id === _newColumn.id) {
+            _exists = true;
           }
         }
 
-        if (!exists) {
+        if (!_exists) {
           this.addChange('add-column', {
             oldTable: pair.oldTable,
             newTable: pair.newTable,
-            column: newColumn
+            column: _newColumn
           });
         }
       }
     }
-  }
+  };
 
-  diffViews() {
-    const newViews = this.newSchema && this.newSchema.views ? this.newSchema.views : null;
-    const oldViews = this.oldSchema && this.oldSchema.views ? this.oldSchema.views : null;
+  _proto.diffViews = function diffViews() {
+    var _this2 = this;
+
+    var newViews = this.newSchema && this.newSchema.views ? this.newSchema.views : null;
+    var oldViews = this.oldSchema && this.oldSchema.views ? this.oldSchema.views : null;
 
     if (oldViews) {
-      for (const oldView of oldViews) {
-        let newView = null;
+      var _loop3 = function _loop3() {
+        var oldView = _step4.value;
+        var newView = null;
 
         if (newViews) {
-          newView = (0, _lodash.find)(newViews, t => t.id === oldView.id);
+          newView = (0, _lodash.find)(newViews, function (t) {
+            return t.id === oldView.id;
+          });
         }
 
         if (newView) {
           if (oldView.name !== newView.name) {
-            this.addChange('drop-view', {
+            _this2.addChange('drop-view', {
               oldView: oldView
             });
-            this.addChange('create-view', {
+
+            _this2.addChange('create-view', {
               newView: newView
             });
           }
         } else {
-          this.addChange('drop-view', {
+          _this2.addChange('drop-view', {
             oldView: oldView
           });
         }
+      };
+
+      for (var _iterator4 = _createForOfIteratorHelperLoose(oldViews), _step4; !(_step4 = _iterator4()).done;) {
+        _loop3();
       }
     }
 
     if (newViews) {
-      for (const newView of newViews) {
-        let oldView = null;
+      var _loop4 = function _loop4() {
+        var newView = _step5.value;
+        var oldView = null;
 
         if (oldViews) {
-          oldView = (0, _lodash.find)(oldViews, t => t.id === newView.id);
+          oldView = (0, _lodash.find)(oldViews, function (t) {
+            return t.id === newView.id;
+          });
         }
 
         if (!oldView) {
           // do a drop for now `ERROR:  cannot change name of view column`
-          this.addChange('drop-view', {
+          _this2.addChange('drop-view', {
             oldView: newView
           });
-          this.addChange('create-view', {
+
+          _this2.addChange('create-view', {
             newView: newView
           });
         }
+      };
+
+      for (var _iterator5 = _createForOfIteratorHelperLoose(newViews), _step5; !(_step5 = _iterator5()).done;) {
+        _loop4();
       }
     }
-  }
+  };
 
-  diffViewColumns() {
-    const viewPairs = this.viewPairsForColumnDiff;
-    const recreatedViewIdentifiers = [];
+  _proto.diffViewColumns = function diffViewColumns() {
+    var viewPairs = this.viewPairsForColumnDiff;
+    var recreatedViewIdentifiers = [];
 
-    for (const pair of viewPairs) {
-      let needsRebuild = false;
-      const oldColumns = pair.oldView ? pair.oldView.columns : [];
-      const newColumns = pair.newView ? pair.newView.columns : [];
+    for (var _iterator6 = _createForOfIteratorHelperLoose(viewPairs), _step6; !(_step6 = _iterator6()).done;) {
+      var pair = _step6.value;
+      var needsRebuild = false;
+      var oldColumns = pair.oldView ? pair.oldView.columns : [];
+      var newColumns = pair.newView ? pair.newView.columns : [];
 
-      for (let oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
-        const oldColumn = oldColumns[oldIndex];
-        let exists = false;
+      for (var oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
+        var oldColumn = oldColumns[oldIndex];
+        var exists = false;
 
-        for (let newIndex = 0; newIndex < newColumns.length; ++newIndex) {
-          const newColumn = newColumns[newIndex];
+        for (var newIndex = 0; newIndex < newColumns.length; ++newIndex) {
+          var newColumn = newColumns[newIndex];
 
           if (oldColumn.column.id === newColumn.column.id) {
             // The column still exists, but something could've changed about it.
@@ -308,19 +308,19 @@ class SchemaDiff {
         }
       }
 
-      for (let newIndex = 0; newIndex < newColumns.length; ++newIndex) {
-        const newColumn = newColumns[newIndex];
-        let exists = false;
+      for (var _newIndex2 = 0; _newIndex2 < newColumns.length; ++_newIndex2) {
+        var _newColumn2 = newColumns[_newIndex2];
+        var _exists2 = false;
 
-        for (let oldIndex = 0; oldIndex < oldColumns.length; ++oldIndex) {
-          const oldColumn = oldColumns[oldIndex];
+        for (var _oldIndex2 = 0; _oldIndex2 < oldColumns.length; ++_oldIndex2) {
+          var _oldColumn2 = oldColumns[_oldIndex2];
 
-          if (oldColumn.column.id === newColumn.column.id) {
-            exists = true;
+          if (_oldColumn2.column.id === _newColumn2.column.id) {
+            _exists2 = true;
           }
         }
 
-        if (!exists) {
+        if (!_exists2) {
           // column added to view
           needsRebuild = true;
         }
@@ -338,9 +338,74 @@ class SchemaDiff {
         }
       }
     }
-  }
+  };
 
-}
+  _createClass(SchemaDiff, [{
+    key: "tablesPairsForColumnDiff",
+    get: function get() {
+      var _this3 = this;
 
-exports.default = SchemaDiff;
+      // only tables that exist in the old and new schemas should be diff'd for columns
+      var pairs = [];
+
+      if (this.newSchema) {
+        pairs = this.newSchema.tables.map(function (newTable) {
+          var oldTable = null;
+
+          if (_this3.oldSchema) {
+            oldTable = (0, _lodash.find)(_this3.oldSchema.tables, function (t) {
+              return t.id === newTable.id;
+            });
+          }
+
+          return {
+            oldTable: oldTable,
+            newTable: newTable
+          };
+        });
+      } // only process column-level changes on tables that exist already
+
+
+      pairs = (0, _lodash.filter)(pairs, function (pair) {
+        return pair.oldTable && pair.newTable && pair.oldTable.id === pair.newTable.id;
+      });
+      return pairs;
+    }
+  }, {
+    key: "viewPairsForColumnDiff",
+    get: function get() {
+      var _this4 = this;
+
+      // only views that exist in the old and new schemas should be diff'd
+      var pairs = [];
+
+      if (this.newSchema && this.newSchema.views) {
+        pairs = this.newSchema.views.map(function (newView) {
+          var oldView = null;
+
+          if (_this4.oldSchema) {
+            oldView = (0, _lodash.find)(_this4.oldSchema.views, function (t) {
+              return t.id === newView.id;
+            });
+          }
+
+          return {
+            oldView: oldView,
+            newView: newView
+          };
+        });
+      } // only process column-level changes on views that exist already
+
+
+      pairs = (0, _lodash.filter)(pairs, function (pair) {
+        return pair.oldView && pair.newView && pair.oldView.id === pair.newView.id;
+      });
+      return pairs;
+    }
+  }]);
+
+  return SchemaDiff;
+}();
+
+exports["default"] = SchemaDiff;
 //# sourceMappingURL=schema-differ.js.map
